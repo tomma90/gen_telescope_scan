@@ -1,3 +1,4 @@
+import numpy as np
 from generate_scan import generate_scan
 
 nside = 64
