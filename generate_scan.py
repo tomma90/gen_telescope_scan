@@ -163,9 +163,11 @@ def generate_scan(nside, alpha, precession_hr, beta, spin_rpm, det_gamma, days, 
 			ipix = hp.vec2pix(nside, v_new[0], v_new[1], v_new[2])
 
 			# Detector angle on the sky with respect to the great circle
-			angle = np.arcsin(np.dot(det_new, plane_axis)/np.linalg.norm(det_new)/np.linalg.norm(plane_axis))
-			angle = np.pi/2. - angle
-
+			sin = np.inner(det_new, plane_axis)/np.linalg.norm(det_new)/np.linalg.norm(plane_axis)
+			sin = np.clip(sin, -1.0, 1.0)
+			angle = np.arcsin(sin)
+			angle = np.pi/2 - angle
+			
 			# Update maps
 			cos4[ipix] = cos4[ipix] + np.cos(4.*angle)
 			sin4[ipix] = sin4[ipix] + np.sin(4.*angle)
