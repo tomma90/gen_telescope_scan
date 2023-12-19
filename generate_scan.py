@@ -112,6 +112,7 @@ def generate_scan(nside, alpha, precession_hr, beta, spin_rpm, det_gamma, days, 
 	sin4 = np.zeros(hp.nside2npix(nside))
 	cos2 = np.zeros(hp.nside2npix(nside))
 	sin2 = np.zeros(hp.nside2npix(nside))
+	sin2cos2 = np.zeros(hp.nside2npix(nside))
 	nhit = np.zeros(hp.nside2npix(nside))
 	
 	# Initialization of the boresight axis in the xz plane at alpha+beta deg from the x axis  
@@ -132,6 +133,7 @@ def generate_scan(nside, alpha, precession_hr, beta, spin_rpm, det_gamma, days, 
 		# Save hit map and cross-linking maps
 		if i == 1 or i%days_out == 0. or i == 365 or i == 365*2 or i == 365*3 or i == int(days):
 			hp.write_map('nhit_day_%d.fits'%i, nhit)
+			hp.write_map('sin2cos2_day_%d.fits'%i, sin2cos2)
 			hp.write_map('cos2_day_%d.fits'%i, cos2)
 			hp.write_map('sin2_day_%d.fits'%i, sin2)
 			hp.write_map('cos4_day_%d.fits'%i, cos4)
@@ -173,5 +175,6 @@ def generate_scan(nside, alpha, precession_hr, beta, spin_rpm, det_gamma, days, 
 			sin4[ipix] = sin4[ipix] + np.sin(4.*angle)
 			cos2[ipix] = cos2[ipix] + np.cos(2.*angle)
 			sin2[ipix] = sin2[ipix] + np.sin(2.*angle)
+			sin2cos2[ipix] = sin2cos2[ipix] + np.sin(2.*angle)*np.cos(2.*angle)
 			nhit[ipix] = nhit[ipix] + 1.
 		
