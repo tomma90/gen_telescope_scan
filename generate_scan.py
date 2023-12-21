@@ -6,7 +6,7 @@ import time
 from numba import jit
 
 # Normalize Vector or Quaternion
-@jit
+@jit(nopython=True)
 def normalize(v):
 	size = v.size
 	if size == 3:
@@ -18,7 +18,7 @@ def normalize(v):
 	return v/lenght
 
 # Quaternion Product
-@jit
+@jit(nopython=True)
 def q_mult(q1, q2):
 	w = q1[0] * q2[0] - q1[1] * q2[1] - q1[2] * q2[2] - q1[3] * q2[3]
 	x = q1[0] * q2[1] + q1[1] * q2[0] + q1[2] * q2[3] - q1[3] * q2[2]
@@ -27,18 +27,18 @@ def q_mult(q1, q2):
 	return np.array([w, x, y, z])
 
 # Quaternion Conjugate: q-1
-@jit
+@jit(nopython=True)
 def q_conjugate(q):
 	return np.array([q[0], -q[1], -q[2], -q[3]])
 
 # Rotate a Vector Using a Quaternion: qvq-1
-@jit
+@jit(nopython=True)
 def rotate_vector(q1, v1):
 	q2 = np.concatenate((np.array([0.]),v1))
 	return q_mult(q_mult(q1, q2), q_conjugate(q1))[1:]
 
 # Create a Quaternion that defines a rotation by an angle theta (deg) around a vector [x,y,z]
-@jit
+@jit(nopython=True)
 def rotaxis_to_q(v, theta):
 	v = normalize(v)
 	theta = np.deg2rad(theta)
@@ -49,7 +49,7 @@ def rotaxis_to_q(v, theta):
 	return np.array([w, x, y, z])
 
 # Define rotation around the Sun: 1 deg per day around vector [0,0,1] (z axis)
-@jit
+@jit(nopython=True)
 def rot_around_sun(v, t):
 	nu_around_sun = 1./365./24./60./60.
 	z = np.array([0.,0.,1.])
@@ -60,7 +60,7 @@ def rot_around_sun(v, t):
 # Define satellite precession around anti-sun direction: 
 # initialized with anti-sun direction aligned with x axis [1,0,0]
 # precession defined by the period in hour
-@jit
+@jit(nopython=True)
 def rot_around_antisun_dir(v, precession_hr, t):
 	nu_around_antisun_dir = 1./precession_hr/60./60.
 	x = np.array([1.,0.,0.])
@@ -71,7 +71,7 @@ def rot_around_antisun_dir(v, precession_hr, t):
 # Define spin around spin-axis tilted by 45 deg with respect to anti-sun direction: 
 # initialized with spin-axis oriented at 45 deg from x axis in 
 # the xz plane [1./np.sqrt(2),0.,1./np.sqrt(2)] spin defined by the frequency in rpm
-@jit
+@jit(nopython=True)
 def rot_around_spin_ax(v, spin_rpm, t):
 	nu_around_spin_ax = spin_rpm/60.
 	xz45 = np.array([1./np.sqrt(2),0.,1./np.sqrt(2)])
@@ -82,7 +82,7 @@ def rot_around_spin_ax(v, spin_rpm, t):
 # Define HWP rotation around boresight direction: 
 # boresight direction defined by the axis variable 
 # rotation defined by the HWP frequency in rpm
-@jit
+@jit(nopython=True)
 def rot_HWP(v, hwp_rpm, t, axis):
 	nu_around_boresight = hwp_rpm/60.
 	q = rotaxis_to_q(axis, 360.*4.*nu_around_boresight*t)
